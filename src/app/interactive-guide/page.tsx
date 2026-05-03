@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ChevronRight, ChevronLeft, CalendarDays, BookOpen, 
   CheckCircle2, Vote, Users, FileText, AlertTriangle, 
-  MapPin, Sparkles, RefreshCw, PartyPopper, CheckSquare
+  MapPin, Sparkles, RefreshCw, PartyPopper, CheckSquare, IdCard
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

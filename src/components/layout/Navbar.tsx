@@ -33,6 +33,7 @@ export default function Navbar() {
 
   return (
     <header
+      role="banner"
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
         isScrolled
@@ -51,7 +52,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
           {navLinks.map((link) => (
             <Link
               key={link.key}
@@ -105,6 +106,9 @@ export default function Navbar() {
           <button
             className="p-2 text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-nav-menu"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -113,7 +117,7 @@ export default function Navbar() {
 
       {/* Mobile Nav Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full glass-card border-t border-border/50 flex flex-col py-4 px-4 shadow-xl">
+        <div id="mobile-nav-menu" role="navigation" aria-label="Mobile navigation" className="lg:hidden absolute top-full left-0 w-full glass-card border-t border-border/50 flex flex-col py-4 px-4 shadow-xl">
           {navLinks.map((link) => (
             <Link
               key={link.key}

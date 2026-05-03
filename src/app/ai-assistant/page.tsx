@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { mockCandidates, mockTimelines } from "@/lib/mock-db";
 import { useTranslation } from "@/context/LanguageContext";
+import Link from "next/link";
 
 type Message = {
   id: string;
