@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Sparkles, AlertCircle, ChevronRight, CheckCircle2, CalendarDays, BookOpen, MapPin, Building } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles, AlertCircle, ChevronRight, CheckCircle2, CalendarDays, BookOpen, MapPin, Building, Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { mockCandidates, mockTimelines } from "@/lib/mock-db";
@@ -22,7 +22,43 @@ export default function AIAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setInput(prev => prev ? `${prev} ${transcript}` : transcript);
+          setIsListening(false);
+        };
+        
+        recognitionRef.current.onerror = () => setIsListening(false);
+        recognitionRef.current.onend = () => setIsListening(false);
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current?.start();
+        setIsListening(true);
+      } catch (e) {
+        console.error("Speech recognition error:", e);
+      }
+    }
+  };
 
   // Initialize welcome message when t is available
   useEffect(() => {
@@ -339,13 +375,32 @@ export default function AIAssistantPage() {
 
         <div className="mt-2 pt-4 border-t border-border/50 bg-background/50 backdrop-blur-sm -mx-4 -mb-4 px-4 pb-4 md:-mx-6 md:-mb-6 md:px-6 md:pb-6 rounded-b-3xl">
           <div className="relative flex items-center">
+            {recognitionRef.current && (
+              <button
+                type="button"
+                onClick={toggleListening}
+                className={cn(
+                  "absolute left-2 z-10 p-2.5 rounded-full transition-all flex items-center justify-center",
+                  isListening 
+                    ? "bg-red-500 text-white animate-pulse shadow-md" 
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+                aria-label={isListening ? "Stop listening" : "Start voice input"}
+                title={isListening ? "Stop listening" : "Start voice input"}
+              >
+                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+              </button>
+            )}
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder={t("ai_placeholder")}
-              className="w-full bg-background border-2 border-border rounded-full pl-6 pr-14 py-4 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm"
+              placeholder={isListening ? t("ai_listening") || "Listening..." : t("ai_placeholder")}
+              className={cn(
+                "w-full bg-background border-2 border-border rounded-full pr-14 py-4 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm",
+                recognitionRef.current ? "pl-14" : "pl-6"
+              )}
             />
             <button
               onClick={() => handleSend()}

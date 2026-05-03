@@ -22,6 +22,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
   },
+  manifest: "/manifest.json",
+  themeColor: "#6366f1",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "VoteWise",
+  },
 };
 
 export default function RootLayout({
